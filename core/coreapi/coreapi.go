@@ -30,7 +30,7 @@ func (api *CoreAPI) Dag() coreiface.DagAPI {
 }
 
 func (api *CoreAPI) Object() coreiface.ObjectAPI {
-	return (*ObjectAPI)(api)
+	return &ObjectAPI{api, nil}
 }
 
 func (api *CoreAPI) ResolveNode(ctx context.Context, p coreiface.Path) (coreiface.Node, error) {
