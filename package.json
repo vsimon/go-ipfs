@@ -509,6 +509,12 @@
       "hash": "QmYmhgAcvmDGXct1qBvc1kz9BxQSit1XBrTeiGZp2FvRyn",
       "name": "go-libp2p-blankhost",
       "version": "0.2.3"
+    },
+    {
+      "author": "frist",
+      "hash": "QmbWpD2QmLEmmoXhYpnc2E4g3jWB5TawSZmYavJopcRk44",
+      "name": "opentracing-go",
+      "version": "0.0.0"
     }
   ],
   "gxVersion": "0.10.0",
