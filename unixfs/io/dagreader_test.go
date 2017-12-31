@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"strings"
 	"testing"
 
@@ -69,6 +70,44 @@ func TestSeekAndRead(t *testing.T) {
 		if reader.Offset() != int64(i+1) {
 			t.Fatal("expected offset to be increased by one after read")
 		}
+	}
+}
+
+func TestSeekAndReadLarge(t *testing.T) {
+	dserv := testu.GetDAGServ()
+	inbuf := make([]byte, 20000)
+	rand.Read(inbuf)
+
+	node := testu.GetNode(t, dserv, inbuf, testu.UseProtoBufLeaves)
+	ctx, closer := context.WithCancel(context.Background())
+	defer closer()
+
+	reader, err := NewDagReader(ctx, node, dserv)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = reader.Seek(10000, io.SeekStart)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	buf := make([]byte, 100)
+	_, err = io.ReadFull(reader, buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !bytes.Equal(buf, inbuf[10000:10100]) {
+		t.Fatal("seeked read failed")
+	}
+
+	pbdr := reader.(*pbDagReader)
+	if pbdr.promises[0] != nil {
+		t.Fatal("memory that was seeked past shouldnt get allocated")
+	}
+	if pbdr.promises[len(pbdr.promises)-1] != nil {
+		t.Fatal("nodes past the buffering limit shouldnt be allocated")
 	}
 }
 
